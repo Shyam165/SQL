@@ -1,0 +1,453 @@
+-----------------------------------------------------
+if we want to delete the primary key constraint then first we need to remove the auto_increment constraint
+primary keys --> not null, unique, sort the rows(by default)
+
+----------------------------------------------------
+------load the data--------------------------------
+note:- first create table then load the content and make sure to care of proper data format in the csv file like--> yyyy-mm-dd
+syntax:-->  load data infile "C:\\Users\\Ravi Ramawat\\OneDrive - Grras Solution Pvt. Ltd\\Desktop\\gs.csv" into table orders fields terminated by ',' enclosed by '"' lines terminated by '\n' ignore 1 rows;
+
+------------------order of executions----------------
+FROM ->
+JOIN ->
+WHERE ->
+GROUP BY ->
+HAVING ->
+SELECT ->
+DISTINCT ->
+ORDER BY ->
+LIMIT/OFFSET ->
+UNION/INTERSECT/EXCEPT ->
+Other clauses ->
+
+
+from --> join --> where --> group by --> having ---> select --> distinct --> order by
+
+-----------------------------------------------------
+
+------------------To create database:----------------
+create database if not exists database_name
+
+---------------to create table-----------------
+
+create table if not EXISTS users(
+id integer,
+name varchar(255), 
+email varchar(255),
+password varchar(255)
+)
+
+--------------drop and truncate the table--------------
+
+drop table table_name
+truncate table table_name
+
+--------------------------------------------------------
+
+create table if not EXISTS users(
+id integer,
+name varchar(255), 
+email varchar(255),
+constraint u_email unique(email, name)     //here later we can call this constraint by using its name i.e u_email 
+)
+
+------------------------------------------------------------
+
+create table orders(
+order_id integers, 
+user_id integers,
+time_of_orders datatime,
+primary key(order_id),
+foreign key(user_id) refereces users(id)
+)
+
+--------------------------------------------------------------
+
+create table students(
+sid integer primary key,
+sname varchar (255) not null,
+email varchar (255) not null unique,
+age integer check (age > 6 and age < 25)
+)
+
+-----------------------------------------------------------------
+
+create table passenger(
+pid integer primary key,
+pname varchar(255) not null,
+gender varchar(255) default "others"
+)
+
+
+//here in above example if we will not provide any gender then it will be others
+
+-------------------------------------------------------------------
+
+
+create table passenger(
+id integer primary key,
+name varchar(255) not null,
+journey_date datetime default current_timestamp
+)
+
+------------------------------------------------------------------
+
+create table passenger(
+id integer primary key auto_increment,
+name varchar (255) not null
+)
+
+---------------------------------------------------------------------
+------------------------------Constraint:----------------------
+Not null
+unique
+primary key
+foreign key
+check
+default
+auto_increment
+
+----------------------------------------------------------------
+------------------------------Alter table-----------------------
+add cols
+delete cols
+modify cols
+add/remove constraints
+
+-----------------------------------------------------------------
+
+alter table students add column college varchar(255) not null
+
+-----------------------------------------------------------------
+
+alter table students drop column age
+
+-----------------------------------------------------------------
+
+alter table students modify column sname integer
+
+-----------------------------------------------------------------
+
+alter table passenger add column email varchar(255) not null
+alter table passenger add constraint p_email unique(email)
+alter table passenger drop constaint p_email
+
+-----------------------------------------------------------------
+-----------------------------DML commands------------------------
+1. Insert 
+2. Retrieve
+-- all cols
+-- filter cols
+-- alias as
+-- expression
+-- constant
+-- distinct single col
+-- distinct multiple col
+-- comparison operator
+-- and / or/ between
+-- in /not in
+-- wildcards
+-- order by query execution
+3. Update
+4. Delete
+
+-----------------------------------------------------------------
+
+insert into students(sid, sname, college) values (4, "Nitish", "abc@gmail.com", "HIT")
+
+--------------another way-------------
+//if we want to insert in all the columns values
+insert into students values (5, "Rahul", "abc1@gmail.com", "IIT")
+
+//multiple values insertion
+insert into students values (5, "Rahul", "abc1@gmail.com", "IIT"),(6, "Rahul1", "abc1@gmail.com", "IIT"),(7, "Rahul2", "abc1@gmail.com", "IIT")
+
+-----------------------------------------------------------------
+------------------------titanic dataset--------------------------
+
+select * from train
+select name, sex, survived from train
+select name as PassengerName,sex as gender, survived from train
+select name , sibsp + parch as family from train
+select name, age + 102 as currentage from train
+select name, 100000 as compensation from train
+select distinct sex from train
+	--gives two rows only for male and female
+select distinct embarked from train
+select distinct pclass from train
+select distinct pclass , embarked from train 
+	--gives unique combination all from two cols
+select * from train where Survived = 0
+	--gives all rows who is not survived
+select * from train where pclass = 3
+select * from train where age > 50
+select * from train where pclass = 3 and Survived = 0
+select * from train where age between 10 and 15
+
+
+-----------------------------------------------------------------
+----------------------------------movies dataset-----------------
+select title from movies where genre like 'Comedy' or genre like 'Action'
+
+//if we want for more genre then we can write in another way:replacement of multiple OR's
+select title, genre from movies where genre in ("Action", "Horrer", "Drama")
+
+//inverse of above:
+select title, genre from movies where genre not in ("Action", "Horrer", "Drama")
+
+
+-----------------------------------------------------------------
+---------------Wildcards for searching in the strings------------
+select title from movies where title like 'A%'  ---starting with A and remaining can be anything
+
+//for searching which ends with character a
+select title from movies where title like '%a'
+
+//for finding particular word in the movies:
+select title from movies where title like '%man%'
+
+//for searching where actor like khan or Kapoor
+select title,actor from movies where actor like "%khan%" or actor like "%Kapoor%"
+
+//if you want to find the those movies which has only five characters
+select title from movies where title like '_____'
+
+//five character including A which is at starting
+select title from movies where title like 'A____'
+
+
+-----------------------------------------------------------------
+----------------------------Update-------------------------------
+update passenger set name = 'Rahul'
+
+//if we want only those name which will be changes which has email like gmail in between
+update passenger set name = 'Rohit' where email like '%gmail%'
+
+update passenger set name = 'ankit' , email = 'abc@gmail.com' where email like '%yahoo%'
+
+-----------------------------------------------------------------
+----------------------Delete-------------------------------------
+
+delete from passenger where id=1
+delete from passenger where id>2 and email like '%yahoo'
+
+//delete all rows or Truncate table
+delete from passenger where 1    //here 1 means all rows will be true
+
+
+-----------------------------------------------------------------
+--------------------------functions------------------------------
+--ABS
+--ROUND
+--CEIL
+--FLOOR
+--UPPER/LOWER
+--CONCAT
+--LENGTH
+--SUBSTR(STRING,START(1), LENGTH)
+-------------AGGREGATE FUNCTIONS---------------
+--MIN/MAX/SUM/AVG
+--COUNT/COUNT WITH DISTINCT
+
+note:-- MIN, MAX, COUNT func can be applied on both number and character typed cols
+
+-----------------------------------------------------------------
+--ABS
+select title, ABS((india_gross - budget)) as profit from movies
+
+-----------------------------------------------------------------
+--ROUND
+select title, ROUND(runtime/60) as runtime_hrs from movies
+select title, ROUND(runtime/60,1) as runtime_hrs from movies  //upto 1 decimal place it has to show
+
+-----------------------------------------------------------------
+--CEIL: --> 2.4 ---> 3
+--FLOOR: --> 2.4 --> 2
+select title, CEIL(runtime/60) as runtime_hrs from movies
+
+-----------------------------------------------------------------
+--UPPER/LOWER
+select upper(title) from movies
+
+-----------------------------------------------------------------
+--CONCAT
+select title, concat(actor, ' ', director) as crew from movies
+
+-----------------------------------------------------------------
+--LENGTH
+select title, length(title) as length from movies
+
+-----------------------------------------------------------------
+--SUBSTR(STRING,START(1), LENGTH)
+//taking first five characters
+select title, substr(title,1,5) as short from movies
+//start from 3 now
+select title, substr(title,3,5) as short from movies
+
+-----------------------------------------------------------------
+--MIN/MAX/SUM/AVG
+select max(budget) from movies
+
+select min(india_gross) from movies
+
+select sum(india_gross) from movies
+
+select avg(india_gross) from movies
+
+-----------------------------------------------------------------
+--COUNT/COUNT WITH DISTINCT
+select count(*) from movies  //here * means in every rows
+
+select count(distinct(actor)) from movies  //unique actors count
+
+-----------------------------------------------------------------
+---------------SORTING DATA----------------
+//to sort the movies acc. to the max profit
+select title, (worldwide_gross - budget) as profit from movies order by profit desc
+
+// if we want top five movies -- use limit 5
+select title, (worldwide_gross - budget) as profit from movies order by profit desc limit 5
+
+
+//worst five movies
+select title, (worldwide_gross - budget) as profit from movies order by profit asc limit 5
+
+//we can sort movies more than 1 col
+select * from movies order by genre, title
+
+//now the title is in descending order which starts from z 
+select * from movies order by genre, title desc
+
+-----------------------------------------------------------------
+-------------------GROUPING DATA------------------
+//finding top five actors which has highest movies
+select actor, count(*) as num_movies from movies group by actor order by num_movies desc limit 5
+
+//finding which genre has maximum profit
+select genre, sum(worldwide_gross - budget) as total_profit from movies group by genre order by total_profit desc limit 5
+
+//finding on an average which director has provides maximum profit 
+select director, avg(worldwide_gross - budget) as avg_profit from movies group by director order by avg_profit desc limit 5
+
+//find the movie name which has the maximum budget
+select title, budget from movies group by title order by budget desc limit 5
+
+//which actor or director combinations has maximum profit
+select actor, director , sum(worldwide_gross - budget) as profit from movies group by actor, director order by profit desc limit 5
+
+//top five actors which has produce maximum profit for the directors
+select actor, sum(worldwide_gross - budget) as total_profit from movies group by actor order by total_profit desc limit 10
+
+-----------------------------------------------------------------
+------------------------------HAVING-----------------
+having ----->filters to the group by
+where -----> filters to the select
+
+//which actors have average screens greater than 1000.
+select actor, avg(screens) as opening from movies group by actor having opening > 1000 order by opening desc
+
+//
+
+-----------------------------------------------------------------
+------------------CASE-----------------------
+select title, (worldwide_gross - budget) profit,
+case
+     when (worldwide_gross - budget) > 1000000000 then "super hit"
+     when (worldwide_gross - budget) > 250000000 and (worldwide_gross - budget) < 1000000000 then "hit"
+     when (worldwide_gross - budget) > 0 and (worldwide_gross - budget) < 250000000 then "average"
+      else "flop"
+end as verdict
+from movies
+
+-----------------------------------------------------------------
+-------------JOIN-------------------------------
+
+CARTESIAN PRODUCT
+INNER JOIN
+SELF  JOIN
+OUTER JOIN
+--LEFT JOIN
+--RIGHT JOIN
+--FULL OUTER
+
+---------CARTESIAN PRODUCT---------
+//users --> 6 rows and groups ---> 4 rows , now ---> 24 rows in the output
+select * from users cross join groups
+
+
+//inner join
+SELECT * FROM membership m JOIN users u ON m.uid = u.id  //can be used inner join
+-----------------------------------------------------------------
+//left outer join or left join
+select * from membership m left outer join users u on m.uid = u.id
+
+
+-----------------------------------------------------------------
+//right join
+select * from membership m right outer join users u on m.uid = u.id
+
+-----------------------------------------------------------------
+//full outer join
+//union --> gives all unique values
+//union all --> it include duplicate values also
+
+select * from membership m left outer join users u on m.uid = u.id
+union
+select * from membership m right outer join users u on m.uid = u.id
+-----------------------------------------------------------------
+//we want now name, gname  -->by using multiple joins
+select name, gname from membership m join users u on m.uid = u.id join
+groups g on m.gid = g.gid
+
+-----------------------------------------------------------------
+//self join --> used for single same table
+select u1.name, u2.name from users u1 join users u2 on u1.emergency_contact = u2.id
+-----------------------------------------------------------------
+
+Subquery
+--Independent
+-> find movie with max budget
+-> find movies of top actors
+
+Correlated query
+-> find top movie of each genre
+
+-----------------------------------------------------------------
+//if inner single queries provides single value
+select * from movies where budget = (select max(budget) from movies)
+
+-----------------------------------------------------------------
+//if inner single queries provides multiple values
+select * from movies where actor IN (select distinct(actor) from movies where actor like 'A%')
+
+-----------------------------------------------------------------
+-> find movies of top actors
+select * from movies where actor in (select actor from (select actor, sum(worldwide_gross - budget) as profit from movies group by actor order by profit desc limit 5) A)
+
+-----------------------------------------------------------------
+-> find top movie of each genre
+select title, genre , (worldwide_gross - budget) as profit from movies m1 where (worldwide_gross - budget) = (select max (worldwide_gross - budget) from movies m2 where m2.genre = m1.genre)
+-----------------------------------------------------------------
+
+--------------------------------------------------------------------------END----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
